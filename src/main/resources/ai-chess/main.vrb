@@ -1,0 +1,9 @@
+\frametitle{Search: Alpha-Beta Pruning}
+\begin{itemize}
+\item Problem with Minimax: too expensive
+\item Prune the game tree by not considering irrelevant branches
+\item Alpha $=$ Value of the best possible move you can make, that you have computed so far
+\item Beta $=$ Value of the best possible move your opponent can make, that you have computed so far
+\item If at any time Alpha $>=$ Beta, then your opponent can force a worse position than your best move so far, so there's no need to evaluate this move
+\item Initially, start the search with Alpha $= -\infty$ and Beta $= \infty$
+\end{itemize}
