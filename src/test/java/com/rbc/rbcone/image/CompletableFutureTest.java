@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 @SuppressWarnings("Duplicates")
 public class CompletableFutureTest {
 
-    private List<String> imageNames = Arrays.asList(
+    private final List<String> imageNames = Arrays.asList(
             "Cat",
             "Dog",
             "Elephant",
@@ -159,8 +159,7 @@ public class CompletableFutureTest {
                 .forEach(System.out::println);
 
         long end = System.nanoTime();
-        long totalTime = (end - start) / 1_000_000;
-        System.out.println(String.format("\nFinished loading all images. Total time: %dms", totalTime));
+        System.out.println(String.format("\nFinished loading all images. Total time: %dms", (end - start) / 1_000_000));
     }
 
     @Test
@@ -173,8 +172,7 @@ public class CompletableFutureTest {
                 .forEach(System.out::println);
 
         long end = System.nanoTime();
-        long totalTime = (end - start) / 1_000_000;
-        System.out.println(String.format("\nFinished loading all images. Total time: %dms", totalTime));
+        System.out.println(String.format("\nFinished loading all images. Total time: %dms", (end - start) / 1_000_000));
     }
 
     @Test
@@ -199,8 +197,7 @@ public class CompletableFutureTest {
                 .forEach(System.out::println);
 
         long end = System.nanoTime();
-        long totalTime = (end - start) / 1_000_000;
-        System.out.println(String.format("\nFinished loading all images. Total time: %dms", totalTime));
+        System.out.println(String.format("\nFinished loading all images. Total time: %dms", (end - start) / 1_000_000));
     }
 
 }
