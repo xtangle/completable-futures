@@ -1,4 +1,4 @@
-package com.rbc.rbcone.images;
+package com.rbc.rbcone.image;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;

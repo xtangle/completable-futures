@@ -1,4 +1,4 @@
-package com.rbc.rbcone.images;
+package com.rbc.rbcone.image;
 
 public class TransformedData {
     private String name;

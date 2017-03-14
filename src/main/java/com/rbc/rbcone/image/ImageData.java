@@ -1,4 +1,4 @@
-package com.rbc.rbcone.images;
+package com.rbc.rbcone.image;
 
 public class ImageData {
     private String name;

@@ -1,4 +1,4 @@
-package com.rbc.rbcone.images;
+package com.rbc.rbcone.image;
 
 import org.junit.Test;
 
@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
-import static com.rbc.rbcone.images.TestUtils.delay;
-import static com.rbc.rbcone.images.TestUtils.getImageData;
+import static com.rbc.rbcone.image.TestUtils.delay;
+import static com.rbc.rbcone.image.TestUtils.getImageData;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

@@ -1,4 +1,4 @@
-package com.rbc.rbcone.images;
+package com.rbc.rbcone.image;
 
 import org.junit.Test;
 
@@ -9,9 +9,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
-import static com.rbc.rbcone.images.TestUtils.createDaemonThreadPool;
-import static com.rbc.rbcone.images.TestUtils.delay;
-import static com.rbc.rbcone.images.TestUtils.getImageData;
+import static com.rbc.rbcone.image.TestUtils.createDaemonThreadPool;
+import static com.rbc.rbcone.image.TestUtils.delay;
+import static com.rbc.rbcone.image.TestUtils.getImageData;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
