@@ -1,3 +1,5 @@
+package com.rbc.rbcone.images;
+
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -5,20 +7,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 
+import static com.rbc.rbcone.images.TestUtils.delay;
+import static com.rbc.rbcone.images.TestUtils.getImageData;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings("Duplicates")
 public class FutureTest {
 
-    private String getImageData(String imageName, long loadTime) throws InterruptedException {
-        System.out.println(String.format("Started getting image data for %s", imageName));
-        Thread.sleep(loadTime);
-        System.out.println(String.format("Finished getting image data for %s", imageName));
-        return "Image data for " + imageName;
-    }
-
-    private List<String> images = Arrays.asList(
+    private List<String> imageNames = Arrays.asList(
             "Cat",
             "Dog",
             "Elephant",
@@ -29,27 +26,22 @@ public class FutureTest {
     public void testSync_LoadAll() {
         long start = System.nanoTime();
 
-        images.forEach(image -> {
-            try {
-                String imageData = getImageData(image, 1000);
-                System.out.println(String.format("Loaded image: %s", imageData));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        imageNames.forEach(imageName -> {
+                ImageData imageData = getImageData(imageName);
+                System.out.println(String.format("Loaded image: %s\n", imageData));
         });
 
         long end = System.nanoTime();
         long totalTime = (end - start) / 1_000_000;
-
         System.out.println(String.format("Finished loading all images. Total time: %dms", totalTime));
     }
 
     @Test
-    public void testAsync() throws InterruptedException {
+    public void testFuture() {
         ExecutorService executor = Executors.newCachedThreadPool();
 
-        Future<String> future = executor.submit(new Callable<String>() {
-            public String call() throws Exception {
+        Future<ImageData> future = executor.submit(new Callable<ImageData>() {
+            public ImageData call() throws Exception {
                 return getImageData("Cat", 8000);
             }
         });
@@ -57,37 +49,34 @@ public class FutureTest {
         assertFalse(future.isDone());
         assertFalse(future.isCancelled());
 
-        System.out.println("While waiting, we can do other stuff...");
-        Thread.sleep(5000);
-        System.out.println("Finished doing other stuff");
+        System.out.println("Do other stuff...");
+        delay(4000);
+        System.out.println("Waiting for image data");
 
         try {
-            System.out.println("Blocked until we get image data...");
-
             future.get();
-
-            assertTrue(future.isDone());
-            assertFalse(future.isCancelled());
-
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
+
+        assertTrue(future.isDone());
+        assertFalse(future.isCancelled());
 
         System.out.println("Done");
     }
 
     @Test
-    public void testCancel() throws InterruptedException {
+    public void testCancel() {
         ExecutorService executor = Executors.newCachedThreadPool();
 
-        Future<String> future = executor.submit(() ->
-                getImageData("Cat", 10000)
+        Future<ImageData> future = executor.submit(() ->
+                getImageData("Cat", 8000)
         );
 
         assertFalse(future.isDone());
         assertFalse(future.isCancelled());
 
-        Thread.sleep(5000);
+        delay(4000);
 
         System.out.println("Cancelling task...");
         future.cancel(true);
@@ -97,22 +86,22 @@ public class FutureTest {
 
         System.out.println("Done");
 
-        Thread.sleep(6000);
+        delay(6000);
     }
 
     @Test
-    public void testException() throws InterruptedException {
+    public void testException() {
         ExecutorService executor = Executors.newCachedThreadPool();
 
-        Future<String> future = executor.submit(() ->
-            getImageData("Cat", -10000)
+        Future<ImageData> future = executor.submit(() ->
+                getImageData("Cat", -10000)
         );
 
-        Thread.sleep(5000);
+        delay(4000);
 
         try {
             future.get();
-        } catch (ExecutionException e) {
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -123,16 +112,16 @@ public class FutureTest {
     }
 
     @Test
-    public void testTimeout() throws InterruptedException {
+    public void testTimeout() {
         ExecutorService executor = Executors.newCachedThreadPool();
 
-        Future<String> future = executor.submit(() ->
-            getImageData("Cat", 9999999999999L)
+        Future<ImageData> future = executor.submit(() ->
+                getImageData("Cat", 9999999999999L)
         );
 
         try {
-            future.get(5, TimeUnit.SECONDS);
-        } catch (ExecutionException | TimeoutException e) {
+            future.get(4, TimeUnit.SECONDS);
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
             e.printStackTrace();
         }
 
@@ -145,20 +134,20 @@ public class FutureTest {
     @Test
     public void testAsync_LoadAll() {
         ExecutorService executor = Executors.newCachedThreadPool();
-        List<Future<String>> futures = new ArrayList<>();
+        List<Future<ImageData>> futures = new ArrayList<>();
 
         long start = System.nanoTime();
 
-        images.forEach(image -> {
-            Future<String> future = executor.submit(() ->
-                getImageData(image, 1000)
+        imageNames.forEach(imageName -> {
+            Future<ImageData> future = executor.submit(() ->
+                    getImageData(imageName)
             );
             futures.add(future);
         });
 
         futures.forEach(future -> {
             try {
-                String imageData = future.get();
+                ImageData imageData = future.get();
                 System.out.println(String.format("Loaded image: %s", imageData));
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
@@ -167,7 +156,21 @@ public class FutureTest {
 
         long end = System.nanoTime();
         long totalTime = (end - start) / 1_000_000;
-        System.out.println(String.format("Finished loading all images. Total time: %dms", totalTime));
+        System.out.println(String.format("\nFinished loading all images. Total time: %dms", totalTime));
+    }
+
+    @Test
+    public void testParallelStream_LoadAll() {
+        long start = System.nanoTime();
+
+        imageNames.parallelStream()
+                .map(TestUtils::getImageData)
+                .map(imageData -> String.format("Loaded image: %s", imageData))
+                .forEach(System.out::println);
+
+        long end = System.nanoTime();
+        long totalTime = (end - start) / 1_000_000;
+        System.out.println(String.format("\nFinished loading all images. Total time: %dms", totalTime));
     }
 
 }
