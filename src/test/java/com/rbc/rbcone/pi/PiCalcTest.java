@@ -1,5 +1,7 @@
 package com.rbc.rbcone.pi;
 
+import com.rbc.rbcone.pi.TestUtils.PiCalcFactory;
+
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -30,10 +32,10 @@ public class PiCalcTest {
     private static final String PI_FILE = "pi/pi-million.txt";
     private static final SimpleDateFormat SDF = new SimpleDateFormat("HH:mm:ss.SSS");
 
-    private static final Object[][] MACHIN_TEST = {{new TestUtils.PiCalcFactory(Machin.class)}};
-    private static final Object[][] MACHIN_PARALLEL_TEST = {{new TestUtils.PiCalcFactory(MachinParallel.class)}};
-    private static final Object[][] CHUDNOVSKY_TEST = {{new TestUtils.PiCalcFactory(Chudnovsky.class)}};
-    private static final Object[][] BRENT_SALAMIN_TEST = {{new TestUtils.PiCalcFactory(BrentSalamin.class)}};
+    private static final Object[][] MACHIN_TEST = {{new PiCalcFactory(Machin.class)}};
+    private static final Object[][] MACHIN_PARALLEL_TEST = {{new PiCalcFactory(MachinParallel.class)}};
+    private static final Object[][] CHUDNOVSKY_TEST = {{new PiCalcFactory(Chudnovsky.class)}};
+    private static final Object[][] BRENT_SALAMIN_TEST = {{new PiCalcFactory(BrentSalamin.class)}};
 
     @SuppressWarnings({"unused", "MismatchedReadAndWriteOfArray"})
     private static final Object[][] ALL_PI_CALC_TEST = new Object[][]{
@@ -70,7 +72,7 @@ public class PiCalcTest {
 
     @SuppressWarnings("WeakerAccess")
     @Parameterized.Parameter
-    public TestUtils.PiCalcFactory piCalcFactory;
+    public PiCalcFactory piCalcFactory;
 
     @Rule
     public TestRule watcher = new TestWatcher() {

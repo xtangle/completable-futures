@@ -7,9 +7,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.stream.Collectors;
 
-final class TestUtils {
-
-    private TestUtils() {}
+class TestUtils {
 
     static class PiCalcFactory {
         private Class<? extends PiCalc> piCalcClass;
@@ -18,11 +16,16 @@ final class TestUtils {
             piCalcClass = clazz;
         }
 
-        PiCalc create(int decimalDigits) throws
-                NoSuchMethodException, IllegalAccessException,
-                InvocationTargetException, InstantiationException {
-            return piCalcClass.getConstructor(int.class)
-                    .newInstance(decimalDigits);
+        PiCalc create(int decimalDigits) {
+            PiCalc piCalc = null;
+            try {
+                piCalc = piCalcClass.getConstructor(int.class)
+                        .newInstance(decimalDigits);
+            } catch (InstantiationException | IllegalAccessException |
+                    InvocationTargetException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+            return piCalc;
         }
 
         @Override
@@ -38,4 +41,5 @@ final class TestUtils {
             return buffer.lines().collect(Collectors.joining("\n"));
         }
     }
+
 }
