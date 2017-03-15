@@ -125,6 +125,31 @@ public class CompletableFutureTest {
     }
 
     @Test
+    public void testCompletableFuture_Exceptionally() {
+        CompletableFuture<RawImage> imageDataFuture =
+                CompletableFuture.supplyAsync(() -> getRawImage("Cat", 8000));
+
+        System.out.println("Do other stuff...");
+        delay(4000);
+        System.out.println("Waiting for image data");
+
+        CompletableFuture<RawImage> newImageDataFuture =
+                imageDataFuture.exceptionally(throwable -> new RawImage("Dog", "dog"));
+
+        // imageDataFuture.completeExceptionally(new CustomException("Cats are not allowed!"));
+        // assertTrue(newImageDataFuture.isDone());
+
+        try {
+            RawImage rawImage = newImageDataFuture.get();
+            System.out.println(String.format("Loaded image: %s", rawImage));
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Done");
+    }
+
+    @Test
     public void testCompletableFuture_Join() {
         CompletableFuture<RawImage> imageDataFuture =
                 CompletableFuture.supplyAsync(() -> getRawImage("Cat", 8000));
