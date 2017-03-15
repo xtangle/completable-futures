@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
-import static com.rbc.rbcone.image.ImageLoader.getRawImage;
+import static com.rbc.rbcone.image.ImageService.getRawImage;
 import static com.rbc.rbcone.util.ThreadUtils.createDaemonThreadPool;
 import static com.rbc.rbcone.util.ThreadUtils.delay;
 import static com.rbc.rbcone.util.ThreadUtils.getTimeSince;
@@ -85,7 +85,6 @@ public class CompletableFutureTest {
         CompletableFuture<RawImage> imageDataFuture =
                 CompletableFuture.supplyAsync(() -> getRawImage("Cat", 8000));
 
-
         System.out.println("Do other stuff...");
         delay(4000);
         System.out.println("Waiting for image data");
@@ -157,7 +156,7 @@ public class CompletableFutureTest {
 
         imageDataFutures.stream()
                 .map(CompletableFuture::join)
-                .map(rawImage -> String.format("Loaded image: %s", rawImage))
+                .map(rawImage -> String.format("Loaded raw image: %s", rawImage))
                 .forEach(System.out::println);
 
         System.out.println(String.format("\nFinished loading all images. Total time: %dms", getTimeSince(start)));
@@ -168,8 +167,8 @@ public class CompletableFutureTest {
         long start = System.nanoTime();
 
         imageNames.parallelStream()
-                .map(ImageLoader::getRawImage)
-                .map(rawImage -> String.format("Loaded image: %s", rawImage))
+                .map(ImageService::getRawImage)
+                .map(rawImage -> String.format("Loaded raw image: %s", rawImage))
                 .forEach(System.out::println);
 
         System.out.println(String.format("\nFinished loading all images. Total time: %dms", getTimeSince(start)));
@@ -193,7 +192,7 @@ public class CompletableFutureTest {
 
         imageDataFutures.stream()
                 .map(CompletableFuture::join)
-                .map(rawImage -> String.format("Loaded image: %s", rawImage))
+                .map(rawImage -> String.format("Loaded raw image: %s", rawImage))
                 .forEach(System.out::println);
 
         System.out.println(String.format("\nFinished loading all images. Total time: %dms", getTimeSince(start)));

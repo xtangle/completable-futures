@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import static com.rbc.rbcone.util.ThreadUtils.delay;
 
-public class ImageLoader {
+public class ImageService {
 
     private static final long DEFAULT_DELAY = 1000;
 

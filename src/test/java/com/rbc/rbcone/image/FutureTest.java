@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-import static com.rbc.rbcone.image.ImageLoader.getRawImage;
+import static com.rbc.rbcone.image.ImageService.getRawImage;
 import static com.rbc.rbcone.util.ThreadUtils.delay;
 import static com.rbc.rbcone.util.ThreadUtils.getTimeSince;
 import static org.junit.Assert.assertFalse;
@@ -161,7 +161,7 @@ public class FutureTest {
         long start = System.nanoTime();
 
         imageNames.parallelStream()
-                .map(ImageLoader::getRawImage)
+                .map(ImageService::getRawImage)
                 .map(rawImage -> String.format("Loaded image: %s", rawImage))
                 .forEach(System.out::println);
 

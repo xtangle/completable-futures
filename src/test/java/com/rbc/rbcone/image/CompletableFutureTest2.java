@@ -9,8 +9,8 @@ import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rbc.rbcone.image.ImageLoader.getRawImage;
-import static com.rbc.rbcone.image.ImageLoader.getTransformedImage;
+import static com.rbc.rbcone.image.ImageService.getRawImage;
+import static com.rbc.rbcone.image.ImageService.getTransformedImage;
 import static com.rbc.rbcone.util.ThreadUtils.createDaemonThreadPool;
 import static com.rbc.rbcone.util.ThreadUtils.delay;
 import static com.rbc.rbcone.util.ThreadUtils.getTimeSince;
@@ -34,12 +34,12 @@ public class CompletableFutureTest2 {
             createDaemonThreadPool(Math.min(imageNames.size(), 100));
 
     @Test
-    public void testSync_LoadAllTransformedData() {
+    public void testSync_LoadAllTransformedImages() {
         long start = System.nanoTime();
 
         imageNames.stream()
-                .map(ImageLoader::getRawImage)
-                .map(ImageLoader::getTransformedImage)
+                .map(ImageService::getRawImage)
+                .map(ImageService::getTransformedImage)
                 .map(transformedImage -> String.format("Loaded transformed image: %s\n", transformedImage))
                 .forEach(System.out::println);
 
@@ -47,12 +47,12 @@ public class CompletableFutureTest2 {
     }
 
     @Test
-    public void testParallelStream_LoadAllTransformedData() {
+    public void testParallelStream_LoadAllTransformedImages() {
         long start = System.nanoTime();
 
         imageNames.parallelStream()
-                .map(ImageLoader::getRawImage)
-                .map(ImageLoader::getTransformedImage)
+                .map(ImageService::getRawImage)
+                .map(ImageService::getTransformedImage)
                 .map(transformedImage -> String.format("Loaded transformed image: %s", transformedImage))
                 .forEach(System.out::println);
 
@@ -60,7 +60,7 @@ public class CompletableFutureTest2 {
     }
 
     @Test
-    public void testCompletableFuture_LoadAllTransformedData() {
+    public void testCompletableFuture_LoadAllTransformedImages() {
         long start = System.nanoTime();
 
         List<CompletableFuture<TransformedImage>> transformedDataFutures =
@@ -83,7 +83,7 @@ public class CompletableFutureTest2 {
     }
 
     @Test
-    public void testCompletableFuture_ResizeAllTransformedData() {
+    public void testCompletableFuture_ScaleAllTransformedImages() {
         long start = System.nanoTime();
 
         List<CompletableFuture<ScaledImage>> transformedDataFutures =
@@ -96,20 +96,20 @@ public class CompletableFutureTest2 {
                                 imageData -> CompletableFuture.supplyAsync(() -> getTransformedImage(imageData), executor)
                         ))
                         .map(transformedDataFuture -> transformedDataFuture.thenApply(
-                                ImageLoader::getScaledImage
+                                ImageService::getScaledImage
                         ))
                         .collect(Collectors.toList());
 
         transformedDataFutures.stream()
                 .map(CompletableFuture::join)
-                .map(scaledImage -> String.format("Loaded resized image: %s", scaledImage))
+                .map(scaledImage -> String.format("Loaded scaled image: %s", scaledImage))
                 .forEach(System.out::println);
 
         System.out.println(String.format("\nFinished loading all images. Total time: %dms", getTimeSince(start)));
     }
 
     @Test
-    public void testCompletableFuture_RenderAllResizedData() {
+    public void testCompletableFuture_RenderAllScaledImages() {
         long start = System.nanoTime();
 
         CompletableFuture[] futures =
@@ -122,10 +122,10 @@ public class CompletableFutureTest2 {
                                 imageData -> CompletableFuture.supplyAsync(() -> getTransformedImage(imageData), executor)
                         ))
                         .map(transformedDataFuture -> transformedDataFuture.thenApply(
-                                ImageLoader::getScaledImage
+                                ImageService::getScaledImage
                         ))
                         .map(transformedDataFuture -> transformedDataFuture.thenAccept(
-                                ImageLoader::renderImage
+                                ImageService::renderImage
                         ))
                         .toArray(CompletableFuture[]::new);
 
@@ -135,7 +135,7 @@ public class CompletableFutureTest2 {
     }
 
     @Test
-    public void testCompletableFuture_CombineTransformedData() {
+    public void testCompletableFuture_CombineAllTransformedImages() {
         long start = System.nanoTime();
 
         CompletableFuture<Void> future =
@@ -149,18 +149,18 @@ public class CompletableFutureTest2 {
                         ))
                         .reduce(
                                 CompletableFuture.completedFuture(new TransformedImage(null, "")),
-                                (tf1, tf2) -> tf1.thenCombineAsync(tf2, ImageLoader::combineTransformedImages, executor)
+                                (tf1, tf2) -> tf1.thenCombineAsync(tf2, ImageService::combineTransformedImages, executor)
                         )
-                        .thenApply(ImageLoader::getScaledImage)
-                        .thenAccept(ImageLoader::renderImage);
+                        .thenApply(ImageService::getScaledImage)
+                        .thenAccept(ImageService::renderImage);
 
         future.join();
 
-        System.out.println(String.format("\nFinished rendering all images. Total time: %dms", getTimeSince(start)));
+        System.out.println(String.format("\nFinished rendering final image. Total time: %dms", getTimeSince(start)));
     }
 
     @Test
-    public void testCompletableFuture_CombineTransformedData_TriggerExample() {
+    public void testCompletableFuture_CombineAllTransformedImagesWhenTriggered() {
         long start = System.nanoTime();
 
         CompletableFuture<TransformedImage> closing = new CompletableFuture<>();
@@ -178,10 +178,10 @@ public class CompletableFutureTest2 {
                         ))
                         .reduce(
                                 closing,
-                                (tf1, tf2) -> tf1.thenCombine(tf2, ImageLoader::combineTransformedImages)
+                                (tf1, tf2) -> tf1.thenCombine(tf2, ImageService::combineTransformedImages)
                         )
-                        .thenApply(ImageLoader::getScaledImage)
-                        .thenAccept(ImageLoader::renderImage);
+                        .thenApply(ImageService::getScaledImage)
+                        .thenAccept(ImageService::renderImage);
 
         delay(8000);
 
@@ -190,7 +190,7 @@ public class CompletableFutureTest2 {
 
         future.join();
 
-        System.out.println(String.format("\nFinished rendering all images. Total time: %dms", getTimeSince(start)));
+        System.out.println(String.format("\nFinished rendering final image. Total time: %dms", getTimeSince(start)));
     }
 
 }
