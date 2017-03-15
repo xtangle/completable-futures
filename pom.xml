@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>ca.wbac.study.java</groupId>
+  <groupId>com.rbc.rbcone.java8</groupId>
   <artifactId>completable-futures</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>completable-futures</name>
-  <url>http://maven.apache.org</url>
+  <url>https://github.com/ace-study-group/study-group-java8</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
