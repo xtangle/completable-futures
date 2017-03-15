@@ -1,6 +1,10 @@
 package com.rbc.rbcone.java8.image;
 
-import org.junit.Test;
+import static com.rbc.rbcone.java8.image.ImageService.getRawImage;
+import static com.rbc.rbcone.java8.image.ImageService.getTransformedImage;
+import static com.rbc.rbcone.java8.util.ThreadUtils.createDaemonThreadPool;
+import static com.rbc.rbcone.java8.util.ThreadUtils.delay;
+import static com.rbc.rbcone.java8.util.ThreadUtils.getTimeSince;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,9 +13,7 @@ import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.rbc.rbcone.java8.image.ImageService.getRawImage;
-import static com.rbc.rbcone.java8.image.ImageService.getTransformedImage;
-import static com.rbc.rbcone.java8.util.ThreadUtils.*;
+import org.junit.Test;
 
 @SuppressWarnings("Duplicates")
 public class CompletableFutureTest2 {
@@ -146,7 +148,7 @@ public class CompletableFutureTest2 {
                                 imageData -> CompletableFuture.supplyAsync(() -> getTransformedImage(imageData), executor)
                         ))
                         .reduce(
-                                CompletableFuture.completedFuture(new TransformedImage(null, "")),
+                                CompletableFuture.completedFuture(new TransformedImage()),
                                 (tf1, tf2) -> tf1.thenCombineAsync(tf2, ImageService::combineTransformedImages, executor)
                         )
                         .thenApply(ImageService::getScaledImage)

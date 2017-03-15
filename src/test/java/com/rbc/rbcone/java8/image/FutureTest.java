@@ -1,17 +1,23 @@
 package com.rbc.rbcone.java8.image;
 
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
-
 import static com.rbc.rbcone.java8.image.ImageService.getRawImage;
 import static com.rbc.rbcone.java8.util.ThreadUtils.delay;
 import static com.rbc.rbcone.java8.util.ThreadUtils.getTimeSince;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+
+import org.junit.Test;
 
 @SuppressWarnings("Duplicates")
 public class FutureTest {
@@ -45,8 +51,8 @@ public class FutureTest {
             }
         });
 
-        // assertFalse(future.isDone());
-        // assertFalse(future.isCancelled());
+        assertFalse(future.isDone());
+        assertFalse(future.isCancelled());
 
         System.out.println("Do other stuff...");
         delay(4000);
@@ -59,8 +65,8 @@ public class FutureTest {
             e.printStackTrace();
         }
 
-        // assertTrue(future.isDone());
-        // assertFalse(future.isCancelled());
+        assertTrue(future.isDone());
+        assertFalse(future.isCancelled());
 
         System.out.println(String.format("Done. Image data: %s", rawImage));
     }
@@ -79,7 +85,7 @@ public class FutureTest {
         delay(4000);
 
         System.out.println("Cancelling task...");
-        future.cancel(false);
+        future.cancel(true);
 
         assertTrue(future.isDone());
         assertTrue(future.isCancelled());

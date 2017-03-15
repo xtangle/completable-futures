@@ -1,7 +1,11 @@
 package com.rbc.rbcone.java8.image;
 
-import com.rbc.rbcone.java8.util.CustomException;
-import org.junit.Test;
+import static com.rbc.rbcone.java8.image.ImageService.getRawImage;
+import static com.rbc.rbcone.java8.util.ThreadUtils.createDaemonThreadPool;
+import static com.rbc.rbcone.java8.util.ThreadUtils.delay;
+import static com.rbc.rbcone.java8.util.ThreadUtils.getTimeSince;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,12 +14,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
-import static com.rbc.rbcone.java8.image.ImageService.getRawImage;
-import static com.rbc.rbcone.java8.util.ThreadUtils.createDaemonThreadPool;
-import static com.rbc.rbcone.java8.util.ThreadUtils.delay;
-import static com.rbc.rbcone.java8.util.ThreadUtils.getTimeSince;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
+import com.rbc.rbcone.java8.util.CustomException;
 
 @SuppressWarnings("Duplicates")
 public class CompletableFutureTest {
