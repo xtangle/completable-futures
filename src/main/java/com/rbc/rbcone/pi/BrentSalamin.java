@@ -11,6 +11,10 @@ public class BrentSalamin extends PiCalc {
         super(decimalDigits);
     }
 
+    public BrentSalamin(int decimalDigits, boolean verbose) {
+        super(decimalDigits, verbose);
+    }
+
     /**
      * Uses the Brent-Salamin formula to calculate digits of pi
      * See https://en.wikipedia.org/wiki/Gauss%E2%80%93Legendre_algorithm

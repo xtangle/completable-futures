@@ -1,15 +1,18 @@
 package com.rbc.rbcone.pi;
 
-import com.rbc.rbcone.pi.TestUtils.PiCalcFactory;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Test;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class PiDemoTest {
+import static com.rbc.rbcone.util.ThreadUtils.createDaemonThreadPool;
+import static com.rbc.rbcone.util.ThreadUtils.getTimeSince;
+
+public class PiCalcDemoTest {
 
     private final int DECIMAL_DIGITS = 100_000;
 
@@ -18,8 +21,11 @@ public class PiDemoTest {
                     .map(PiCalcFactory::new)
                     .collect(Collectors.toMap(
                             PiCalcFactory::toString,
-                            piCalcFactory -> piCalcFactory.create(DECIMAL_DIGITS)
+                            piCalcFactory -> piCalcFactory.create(DECIMAL_DIGITS, true)
                     ));
+
+    private final Executor executor =
+            createDaemonThreadPool(Math.min(piCalcs.size(), 100));
 
     @Test
     public void testRunAllInParallel_WaitForAllResults() {
@@ -30,13 +36,14 @@ public class PiDemoTest {
                         () -> new ImmutablePair<>(
                                 entry.getKey(),
                                 entry.getValue().compute()
-                        )
+                        ),
+                        executor
                 ))
                 .map(resultFuture -> resultFuture.thenAccept(
                         result -> {
-                            System.out.println(String.format("%s completed in %dms (%s)",
+                            System.out.println(String.format("%s completed in %dms (pi = %s)",
                                     result.getLeft(),
-                                    (System.nanoTime() - start) / 1_000_000,
+                                    getTimeSince(start),
                                     result.getRight()
                             ));
                         }
@@ -45,8 +52,7 @@ public class PiDemoTest {
 
         CompletableFuture.allOf(futures).join();
 
-        long end = System.nanoTime();
-        System.out.println(String.format("\nAll pi calculators finished. Total execution time: %dms", (end - start) / 1_000_000));
+        System.out.println(String.format("\nAll pi calculators finished. Total execution time: %dms", getTimeSince(start)));
     }
 
     @Test
@@ -58,13 +64,14 @@ public class PiDemoTest {
                         () -> new ImmutablePair<>(
                                 entry.getKey(),
                                 entry.getValue().compute()
-                        )
+                        ),
+                        executor
                 ))
                 .map(resultFuture -> resultFuture.thenAccept(
                         result -> {
-                            System.out.println(String.format("%s completed in %dms (%s)",
+                            System.out.println(String.format("%s completed in %dms (pi = %s)",
                                     result.getLeft(),
-                                    (System.nanoTime() - start) / 1_000_000,
+                                    getTimeSince(start),
                                     result.getRight()
                             ));
                         }
@@ -75,9 +82,8 @@ public class PiDemoTest {
 
         Stream.of(futures).forEach(future -> future.cancel(true));
 
-        long end = System.nanoTime();
-        System.out.println(String.format("\nFirst pi calculator finished. Total execution time: %dms", (end - start) / 1_000_000));
+        System.out.println(String.format("\nFirst pi calculator finished. Total execution time: %dms", getTimeSince(start)));
 
-        Thread.sleep(20000);
+        // Thread.sleep(20000);
     }
 }

@@ -16,6 +16,10 @@ public class Chudnovsky extends PiCalc {
         super(decimalDigits);
     }
 
+    public Chudnovsky(int decimalDigits, boolean verbose) {
+        super(decimalDigits, verbose);
+    }
+
     /**
      * Uses Chudnovsky's formula to calculate digits of pi
      * See http://www.craig-wood.com/nick/articles/pi-chudnovsky/

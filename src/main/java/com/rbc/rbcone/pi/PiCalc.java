@@ -8,17 +8,26 @@ abstract class PiCalc {
     static final int ROUND = BigDecimal.ROUND_FLOOR;
 
     int decimalDigits;
+    boolean verbose;
 
     PiCalc(int decimalDigits) {
+        this(decimalDigits, false);
+    }
+
+    PiCalc(int decimalDigits, boolean verbose) {
         if (decimalDigits < 0) {
             throw new IllegalArgumentException("Number of decimal digits must not be negative.");
         }
         this.decimalDigits = decimalDigits;
+        this.verbose = verbose;
     }
 
     BigDecimal compute() {
-        return this.computeImpl()
-                .setScale(decimalDigits, ROUND);
+        String className = this.getClass().getSimpleName();
+        System.out.println(String.format("%s has started computing...", className));
+        BigDecimal result = this.computeImpl().setScale(decimalDigits, ROUND);
+        System.out.println(String.format("%s has finished computing", className));
+        return result;
     }
 
     abstract BigDecimal computeImpl();

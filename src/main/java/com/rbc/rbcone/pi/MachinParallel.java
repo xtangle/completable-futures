@@ -14,6 +14,10 @@ class MachinParallel extends PiCalc {
         super(decimalDigits);
     }
 
+    public MachinParallel(int decimalDigits, boolean verbose) {
+        super(decimalDigits, verbose);
+    }
+
     @SuppressWarnings("Duplicates")
     @Override
     BigDecimal computeImpl() {

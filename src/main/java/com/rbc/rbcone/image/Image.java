@@ -1,10 +1,14 @@
 package com.rbc.rbcone.image;
 
-public class TransformedData {
-    private String name;
-    private String data;
+public abstract class Image {
+    protected String name;
+    protected String data;
 
-    public TransformedData(String name, String data) {
+    public Image() {
+        this(null, null);
+    }
+
+    public Image(String name, String data) {
         this.name = name;
         this.data = data;
     }
@@ -27,7 +31,7 @@ public class TransformedData {
 
     @Override
     public String toString() {
-        return "TransformedData{" +
+        return "Image{" +
                 "name='" + name + '\'' +
                 ", data='" + data + '\'' +
                 '}';

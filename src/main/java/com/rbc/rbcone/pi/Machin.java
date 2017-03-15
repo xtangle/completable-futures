@@ -8,6 +8,10 @@ public class Machin extends PiCalc {
         super(decimalDigits);
     }
 
+    public Machin(int decimalDigits, boolean verbose) {
+        super(decimalDigits, verbose);
+    }
+
     @SuppressWarnings("Duplicates")
     @Override
     BigDecimal computeImpl() {

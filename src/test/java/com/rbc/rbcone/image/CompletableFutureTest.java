@@ -1,5 +1,6 @@
 package com.rbc.rbcone.image;
 
+import com.rbc.rbcone.util.CustomException;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -9,9 +10,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
-import static com.rbc.rbcone.image.TestUtils.createDaemonThreadPool;
-import static com.rbc.rbcone.image.TestUtils.delay;
-import static com.rbc.rbcone.image.TestUtils.getImageData;
+import static com.rbc.rbcone.image.ImageLoader.getRawImage;
+import static com.rbc.rbcone.util.ThreadUtils.createDaemonThreadPool;
+import static com.rbc.rbcone.util.ThreadUtils.delay;
+import static com.rbc.rbcone.util.ThreadUtils.getTimeSince;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -32,11 +34,11 @@ public class CompletableFutureTest {
 
     @Test
     public void testCompletableFuture() {
-        CompletableFuture<ImageData> imageDataFuture = new CompletableFuture<>();
+        CompletableFuture<RawImage> imageDataFuture = new CompletableFuture<>();
 
         new Thread(() -> {
-            ImageData imageData = getImageData("Cat", 8000);
-            imageDataFuture.complete(imageData);
+            RawImage rawImage = getRawImage("Cat", 8000);
+            imageDataFuture.complete(rawImage);
         }).start();
 
         assertFalse(imageDataFuture.isDone());
@@ -47,8 +49,8 @@ public class CompletableFutureTest {
         System.out.println("Waiting for image data");
 
         try {
-            ImageData imageData = imageDataFuture.get();
-            System.out.println(String.format("Loaded image: %s", imageData));
+            RawImage rawImage = imageDataFuture.get();
+            System.out.println(String.format("Loaded image: %s", rawImage));
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -61,16 +63,16 @@ public class CompletableFutureTest {
 
     @Test
     public void testCompletableFuture_SupplyAsync() {
-        CompletableFuture<ImageData> imageDataFuture =
-                CompletableFuture.supplyAsync(() -> getImageData("Cat", 8000));
+        CompletableFuture<RawImage> imageDataFuture =
+                CompletableFuture.supplyAsync(() -> getRawImage("Cat", 8000));
 
         System.out.println("Do other stuff...");
         delay(4000);
         System.out.println("Waiting for image data");
 
         try {
-            ImageData imageData = imageDataFuture.get();
-            System.out.println(String.format("Loaded image: %s", imageData));
+            RawImage rawImage = imageDataFuture.get();
+            System.out.println(String.format("Loaded image: %s", rawImage));
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -80,19 +82,19 @@ public class CompletableFutureTest {
 
     @Test
     public void testCompletableFuture_Complete() {
-        CompletableFuture<ImageData> imageDataFuture =
-                CompletableFuture.supplyAsync(() -> getImageData("Cat", 8000));
+        CompletableFuture<RawImage> imageDataFuture =
+                CompletableFuture.supplyAsync(() -> getRawImage("Cat", 8000));
 
 
         System.out.println("Do other stuff...");
         delay(4000);
         System.out.println("Waiting for image data");
 
-        imageDataFuture.complete(new ImageData("Dog", "dog"));
+        imageDataFuture.complete(new RawImage("Dog", "dog"));
 
         try {
-            ImageData imageData = imageDataFuture.get();
-            System.out.println(String.format("Loaded image: %s", imageData));
+            RawImage rawImage = imageDataFuture.get();
+            System.out.println(String.format("Loaded image: %s", rawImage));
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -102,20 +104,20 @@ public class CompletableFutureTest {
 
     @Test
     public void testCompletableFuture_CompleteExceptionally() {
-        CompletableFuture<ImageData> imageDataFuture =
-                CompletableFuture.supplyAsync(() -> getImageData("Cat", 8000));
+        CompletableFuture<RawImage> imageDataFuture =
+                CompletableFuture.supplyAsync(() -> getRawImage("Cat", 8000));
 
         System.out.println("Do other stuff...");
         delay(4000);
         System.out.println("Waiting for image data");
 
-        imageDataFuture.completeExceptionally(new TestUtils.CustomException("An exception has been thrown!"));
+        imageDataFuture.completeExceptionally(new CustomException("An exception has been thrown!"));
 
         assertTrue(imageDataFuture.isCompletedExceptionally());
 
         try {
-            ImageData imageData = imageDataFuture.get();
-            System.out.println(String.format("Loaded image: %s", imageData));
+            RawImage rawImage = imageDataFuture.get();
+            System.out.println(String.format("Loaded image: %s", rawImage));
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -125,19 +127,19 @@ public class CompletableFutureTest {
 
     @Test
     public void testCompletableFuture_Join() {
-        CompletableFuture<ImageData> imageDataFuture =
-                CompletableFuture.supplyAsync(() -> getImageData("Cat", 8000));
+        CompletableFuture<RawImage> imageDataFuture =
+                CompletableFuture.supplyAsync(() -> getRawImage("Cat", 8000));
 
         System.out.println("Do other stuff...");
         delay(4000);
         System.out.println("Waiting for image data");
 
-        imageDataFuture.completeExceptionally(new TestUtils.CustomException("An exception has been thrown!"));
+        imageDataFuture.completeExceptionally(new CustomException("An exception has been thrown!"));
 
         assertTrue(imageDataFuture.isCompletedExceptionally());
 
-        ImageData imageData = imageDataFuture.join();
-        System.out.println(String.format("Loaded image: %s", imageData));
+        RawImage rawImage = imageDataFuture.join();
+        System.out.println(String.format("Loaded image: %s", rawImage));
 
         System.out.println("Done");
     }
@@ -146,20 +148,19 @@ public class CompletableFutureTest {
     public void testCompletableFuture_LoadAll() {
         long start = System.nanoTime();
 
-        List<CompletableFuture<ImageData>> imageDataFutures =
+        List<CompletableFuture<RawImage>> imageDataFutures =
                 imageNames.stream()
                         .map(imageName -> CompletableFuture.supplyAsync(
-                                () -> getImageData(imageName)
+                                () -> getRawImage(imageName)
                         ))
                         .collect(Collectors.toList());
 
         imageDataFutures.stream()
                 .map(CompletableFuture::join)
-                .map(imageData -> String.format("Loaded image: %s", imageData))
+                .map(rawImage -> String.format("Loaded image: %s", rawImage))
                 .forEach(System.out::println);
 
-        long end = System.nanoTime();
-        System.out.println(String.format("\nFinished loading all images. Total time: %dms", (end - start) / 1_000_000));
+        System.out.println(String.format("\nFinished loading all images. Total time: %dms", getTimeSince(start)));
     }
 
     @Test
@@ -167,12 +168,11 @@ public class CompletableFutureTest {
         long start = System.nanoTime();
 
         imageNames.parallelStream()
-                .map(TestUtils::getImageData)
-                .map(imageData -> String.format("Loaded image: %s", imageData))
+                .map(ImageLoader::getRawImage)
+                .map(rawImage -> String.format("Loaded image: %s", rawImage))
                 .forEach(System.out::println);
 
-        long end = System.nanoTime();
-        System.out.println(String.format("\nFinished loading all images. Total time: %dms", (end - start) / 1_000_000));
+        System.out.println(String.format("\nFinished loading all images. Total time: %dms", getTimeSince(start)));
     }
 
     @Test
@@ -183,21 +183,20 @@ public class CompletableFutureTest {
 
         long start = System.nanoTime();
 
-        List<CompletableFuture<ImageData>> imageDataFutures =
+        List<CompletableFuture<RawImage>> imageDataFutures =
                 imageNames.stream()
                         .map(imageName -> CompletableFuture.supplyAsync(
-                                () -> getImageData(imageName),
+                                () -> getRawImage(imageName),
                                 executor
                         ))
                         .collect(Collectors.toList());
 
         imageDataFutures.stream()
                 .map(CompletableFuture::join)
-                .map(imageData -> String.format("Loaded image: %s", imageData))
+                .map(rawImage -> String.format("Loaded image: %s", rawImage))
                 .forEach(System.out::println);
 
-        long end = System.nanoTime();
-        System.out.println(String.format("\nFinished loading all images. Total time: %dms", (end - start) / 1_000_000));
+        System.out.println(String.format("\nFinished loading all images. Total time: %dms", getTimeSince(start)));
     }
 
 }

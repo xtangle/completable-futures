@@ -1,7 +1,5 @@
 package com.rbc.rbcone.pi;
 
-import com.rbc.rbcone.pi.TestUtils.PiCalcFactory;
-
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -22,6 +20,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.IntStream;
 
+import static com.rbc.rbcone.util.FileUtils.readFromFile;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
@@ -61,7 +60,7 @@ public class PiCalcTest {
     static {
         try {
             System.out.println(String.format("Reading value of pi from %s ...", PI_FILE));
-            String piString = TestUtils.readFromFile(PI_FILE);
+            String piString = readFromFile(PI_FILE);
             PI = new BigDecimal(piString);
             System.out.println("Finished reading from file\n\n");
         } catch (IOException e) {
